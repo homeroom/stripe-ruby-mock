@@ -109,7 +109,7 @@ module StripeMock
 
         if invalid_type?(params[:type])
           raise Stripe::InvalidRequestError.new(
-            'Invalid type: must be one of card, ideal or sepa_debit',
+            'Invalid type: must be one of card, ideal, sepa_debit or us_bank_account',
             nil,
             http_status: 400
           )
@@ -117,7 +117,7 @@ module StripeMock
       end
 
       def invalid_type?(type)
-        !%w(card ideal sepa_debit).include?(type)
+        !%w(card ideal sepa_debit us_bank_account).include?(type)
       end
     end
   end
