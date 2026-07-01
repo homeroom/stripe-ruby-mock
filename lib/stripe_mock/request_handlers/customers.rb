@@ -5,11 +5,20 @@ module StripeMock
       def Customers.included(klass)
         klass.add_handler 'post /v1/customers',                     :new_customer
         klass.add_handler 'post /v1/customers/([^/]*)',             :update_customer
+        klass.add_handler 'get /v1/customers/([^/]*)/payment_methods', :list_customer_payment_methods
         klass.add_handler 'get /v1/customers/((?!search)[^/]*)',    :get_customer
         klass.add_handler 'delete /v1/customers/([^/]*)',           :delete_customer
         klass.add_handler 'get /v1/customers',                      :list_customers
         klass.add_handler 'get /v1/customers/search',               :search_customers
         klass.add_handler 'delete /v1/customers/([^/]*)/discount',  :delete_customer_discount
+      end
+
+      def list_customer_payment_methods(route, method_url, params, headers)
+        customer_id = method_url.match(route)[1]
+        clone = payment_methods.clone
+        clone.delete_if { |_k, v| v[:customer] != customer_id }
+        clone.delete_if { |_k, v| v[:type] != params[:type] } if params[:type]
+        Data.mock_list_object(clone.values, params)
       end
 
       def new_customer(route, method_url, params, headers)
